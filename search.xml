@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[leveldb安装与使用]]></title>
+    <url>%2F2018%2F06%2F22%2Fleveldb%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[leveldb Google C++ kv数据库。代码风格优秀。涉及到了skip list、内存KV table、LRU cache管理、table文件存储、operation log系统等。 安装下载1git clone https://github.com/google/leveldb.git 编译 安装123mkdir -p build &amp;&amp; cd buildcmake -DCMAKE_BUILD_TYPE=Release .. &amp;&amp; cmake --build .make &amp;&amp; make install 使用hello_leveldb.cc 123456789101112131415161718192021222324252627282930313233343536373839#include &lt;iostream&gt;#include &lt;cassert&gt;#include &lt;cstdlib&gt;#include &lt;string&gt;#include &lt;leveldb/db.h&gt;using namespace std;int main(void)&#123; leveldb::DB *db = nullptr; leveldb::Options options; // 如果数据库不存在就创建 options.create_if_missing = true; // 创建的数据库 /tmp/testdb leveldb::Status status = leveldb::DB::Open(options, &quot;/tmp/testdb&quot;, &amp;db); assert(status.ok()); string key = &quot;akey&quot;; string value = &quot;avalue&quot;; string gvalue; // Put leveldb::Status s = db-&gt;Put(leveldb::WriteOptions(), key, value); if (!s.ok()) &#123; // 写入失败 cout &lt;&lt; s.ToString() &lt;&lt; endl; return 0; &#125; // Get s = db-&gt;Get(leveldb::ReadOptions(), key, &amp;gvalue); cout &lt;&lt; (s.ok() ? gvalue : s.ToString()) &lt;&lt; endl; delete db; return 0;&#125; 编译1g++ hello_leveldb.cc -o test -lpthread -lleveldb 运行结果12# ./testavalue 只做了简单的put get操作，还有delete、snapshot等操作。]]></content>
+      <categories>
+        <category>leveldb</category>
+      </categories>
+      <tags>
+        <tag>leveldb</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Hello World]]></title>
+    <url>%2F2018%2F06%2F21%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[Welcome to 老边’blog]]></content>
+  </entry>
+</search>
