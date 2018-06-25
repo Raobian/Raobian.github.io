@@ -379,7 +379,15 @@
       
         
           
-          Status类是函数执行返回状态类，状态主要是用迭代类型enum Code类,12345678enum Code &#123;    kOk = 0,    kNotFound = 1,    kCorruption = 2,    kNotSupported = 3,    kInvalidArg
+          Status类是函数执行返回状态类，状态主要是用迭代类型enum Code类,12345678enum Code &#123;    kOk = 0,    kNotFound = 1,    kCorruption = 2,    kNotSupported = 3,    kInvalidArgument = 4,    kIOError = 5  &#125;;
+枚举code 长度为4
+私有变量state_,
+state_[0..3] 为消息长度 
+state_[4] 为 返回码
+state_[5..] 为消息实体 123456// OK status has a null state_.  Otherwise, state_ is a new[] array// of the following form://    state_[0..3] == length of message//    state_[4]    == code//    state_[5..]  == messageconst char* state_;
+
+
+构造声明与实现include/leveldb
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -529,7 +537,7 @@
           
           LevelDB 中的字符串没有使用 std:string，而是使用Slice。题外话，redis没有使用C语言中的字符串，而是自己构建了SDS这样一种简单动态字符串。Slice
 include/leveldb/Slice.h
-1234567891011121314151617181920212223
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980class LEVELDB_EXPORT Slice &#123; public:  // 构造函数 创建空的slice  // Create an empty slice.  Slice() : data_(&quot;&quot;), size_(0) &#123; &#125;  // 构造函数 使用d[0, n - 1] 构造  // Create a slice that refers to d[0,n-1].  Slice(const char* d, s
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -679,7 +687,9 @@ include/leveldb/Slice.h
           
           leveldb Google C++ kv数据库。代码风格优秀。涉及到了skip list、内存KV table、LRU cache管理、table文件存储、operation log系统等。
 安装下载1git clone https://github.com/google/leveldb.git
-
+编译 安装123mkdir -p build &amp;&amp; cd buildcmake -DCMAKE_BUILD_TYPE=Release .. &amp;&amp; cmake --build .make &amp;&amp; make install
+使用hello_leveldb.cc
+123456789101112131415161718192021222324252627282930313233343536373839#include &lt;iostream&gt;#include &lt;cassert&gt;#include &lt;cstdlib&gt;#include &lt;string&gt;#include &lt;leveldb/db.h&gt;usin
           ...
           <!--noindex-->
           <div class="post-button text-center">
