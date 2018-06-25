@@ -378,17 +378,14 @@
 
       
         
-          
-          Status类是函数执行返回状态类，状态主要是用迭代类型enum Code类,12345678enum Code &#123;    kOk = 0,    kNotFound = 1,    kCorruption = 2,    kNotSupported = 3,    kInvalidArgument = 4,    kIOError = 5  &#125;;
-枚举code 长度为4
-私有变量state_,
-state_[0..3] 为消息长度 
-state_[4] 为 返回码
-state_[5..] 为消息实体 123456// OK status has a null state_.  Otherwise, state_ is a new[] array// of the following form://    state_[0..3] == length of message//    state_[4]    == code//    state_[5..]  == messageconst char* state_;
-
-
-构造声明与实现include/leveldb
-          ...
+          <p>Status类是函数执行返回状态类，状态主要是用迭代类型enum Code类,<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">enum Code &#123;</span><br><span class="line">    kOk = 0,</span><br><span class="line">    kNotFound = 1,</span><br><span class="line">    kCorruption = 2,</span><br><span class="line">    kNotSupported = 3,</span><br><span class="line">    kInvalidArgument = 4,</span><br><span class="line">    kIOError = 5</span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>枚举code 长度为4</p>
+<h4 id="私有变量state"><a href="#私有变量state" class="headerlink" title="私有变量state_,"></a>私有变量state_,</h4><ul>
+<li>state_[0..3] 为消息长度 </li>
+<li>state_[4] 为 返回码</li>
+<li>state_[5..] 为消息实体 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// OK status has a null state_.  Otherwise, state_ is a new[] array</span><br><span class="line">// of the following form:</span><br><span class="line">//    state_[0..3] == length of message</span><br><span class="line">//    state_[4]    == code</span><br><span class="line">//    state_[5..]  == message</span><br><span class="line">const char* state_;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/25/leveldb之Status/#more" rel="contents">
@@ -534,11 +531,8 @@ state_[5..] 为消息实体 123456// OK status has a null state_.  Otherwise, st
 
       
         
-          
-          LevelDB 中的字符串没有使用 std:string，而是使用Slice。题外话，redis没有使用C语言中的字符串，而是自己构建了SDS这样一种简单动态字符串。Slice
-include/leveldb/Slice.h
-1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980class LEVELDB_EXPORT Slice &#123; public:  // 构造函数 创建空的slice  // Create an empty slice.  Slice() : data_(&quot;&quot;), size_(0) &#123; &#125;  // 构造函数 使用d[0, n - 1] 构造  // Create a slice that refers to d[0,n-1].  Slice(const char* d, s
-          ...
+          <p>LevelDB 中的字符串没有使用 std:string，而是使用Slice。题外话，redis没有使用C语言中的字符串，而是自己构建了SDS这样一种简单动态字符串。Slice</p>
+<p>include/leveldb/Slice.h<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/25/leveldb之Slice/#more" rel="contents">
@@ -684,13 +678,9 @@ include/leveldb/Slice.h
 
       
         
-          
-          leveldb Google C++ kv数据库。代码风格优秀。涉及到了skip list、内存KV table、LRU cache管理、table文件存储、operation log系统等。
-安装下载1git clone https://github.com/google/leveldb.git
-编译 安装123mkdir -p build &amp;&amp; cd buildcmake -DCMAKE_BUILD_TYPE=Release .. &amp;&amp; cmake --build .make &amp;&amp; make install
-使用hello_leveldb.cc
-123456789101112131415161718192021222324252627282930313233343536373839#include &lt;iostream&gt;#include &lt;cassert&gt;#include &lt;cstdlib&gt;#include &lt;string&gt;#include &lt;leveldb/db.h&gt;usin
-          ...
+          <p><strong>leveldb</strong> Google C++ kv数据库。代码风格优秀。<br>涉及到了skip list、内存KV table、LRU cache管理、table文件存储、operation log系统等。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/google/leveldb.git</span><br></pre></td></tr></table></figure>
+<h3 id="编译-安装"><a href="#编译-安装" class="headerlink" title="编译 安装"></a>编译 安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p build &amp;&amp; cd build</span><br><span class="line">cmake -DCMAKE_BUILD_TYPE=Release .. &amp;&amp; cmake --build .</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/22/leveldb安装与使用/#more" rel="contents">
@@ -815,16 +805,9 @@ include/leveldb/Slice.h
       
         
           
-          Welcome to 老边’blog
+            <p>Welcome to 老边’blog</p>
 
           
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/06/21/hello-world/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
         
       
     </div>
