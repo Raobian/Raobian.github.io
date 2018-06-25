@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://yoursite.com/2018/06/25/leveldb%E4%B9%8BStatus/</loc>
+        <lastmod>2018-06-25T10:10:38.589Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://yoursite.com/2018/06/25/leveldb%E4%B9%8BSlice/</loc>
         <lastmod>2018-06-25T08:47:44.324Z</lastmod>
         <changefreq>weekly</changefreq>
