@@ -79,20 +79,21 @@
 
 
 
-<meta name="description" content="test">
+<meta name="description" content="Arena 内存池，避免频繁的new/delete，减少内存申请和释放的开销。模型如下">
 <meta name="keywords" content="leveldb">
 <meta property="og:type" content="article">
 <meta property="og:title" content="leveldb之Arena">
 <meta property="og:url" content="http://yoursite.com/2018/06/26/leveldb之Arena/index.html">
 <meta property="og:site_name" content="老边&#39;blog">
-<meta property="og:description" content="test">
+<meta property="og:description" content="Arena 内存池，避免频繁的new/delete，减少内存申请和释放的开销。模型如下">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2018/06/26/leveldb之Arena/images/arena.jpg">
-<meta property="og:updated_time" content="2018-06-26T06:39:09.320Z">
+<meta property="og:image" content="http://yoursite.com/2018/06/26/leveldb之Arena/images/arena/arena.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/06/26/leveldb之Arena/images/arena/arena_model.jpeg">
+<meta property="og:updated_time" content="2018-06-26T08:04:47.717Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="leveldb之Arena">
-<meta name="twitter:description" content="test">
-<meta name="twitter:image" content="http://yoursite.com/2018/06/26/leveldb之Arena/images/arena.jpg">
+<meta name="twitter:description" content="Arena 内存池，避免频繁的new/delete，减少内存申请和释放的开销。模型如下">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/26/leveldb之Arena/images/arena/arena.jpg">
 
 
 
@@ -378,7 +379,21 @@
       
 
       
-        <p><img src="images/arena.jpg" alt="arena"><br>test</p>
+        <p>Arena 内存池，避免频繁的new/delete，减少内存申请和释放的开销。<br>模型如下<br><img src="images/arena/arena.jpg" alt="arena"><br><img src="images/arena/arena_model.jpeg" alt="arena_model"><br><a id="more"></a></p>
+<h5 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// Allocation state</span><br><span class="line">char* alloc_ptr_;                 // 内存偏移，指向未使用内存首地址</span><br><span class="line">size_t alloc_bytes_remaining_;    // 剩余已申请的内存</span><br><span class="line"></span><br><span class="line">// Array of new[] allocated memory blocks</span><br><span class="line">std::vector&lt;char*&gt; blocks_;       // 记录每个block的首地址</span><br><span class="line"></span><br><span class="line">// Total memory usage of the arena.</span><br><span class="line">port::AtomicPointer memory_usage_;    // 已使用内存大小</span><br></pre></td></tr></table></figure>
+<h5 id="构造析构"><a href="#构造析构" class="headerlink" title="构造析构"></a>构造析构</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Arena::Arena() : memory_usage_(0) &#123;</span><br><span class="line">  alloc_ptr_ = nullptr;  // First allocation will allocate a block</span><br><span class="line">  alloc_bytes_remaining_ = 0;</span><br><span class="line">  // vector会调用默认构造函数初始化</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Arena::~Arena() &#123;</span><br><span class="line">  for (size_t i = 0; i &lt; blocks_.size(); i++) &#123;</span><br><span class="line">    delete[] blocks_[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不允许拷贝构造和 =赋值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// No copying allowed</span><br><span class="line">Arena(const Arena&amp;);</span><br><span class="line">void operator=(const Arena&amp;);</span><br></pre></td></tr></table></figure></p>
+<h5 id="申请内存"><a href="#申请内存" class="headerlink" title="申请内存"></a>申请内存</h5><p>block大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static const int kBlockSize = 4096;</span><br></pre></td></tr></table></figure></p>
+<p>声明<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 申请内存</span><br><span class="line">// Return a pointer to a newly allocated memory block of &quot;bytes&quot; bytes.</span><br><span class="line">char* Allocate(size_t bytes);</span><br><span class="line"></span><br><span class="line">// 申请内存对齐</span><br><span class="line">// Allocate memory with the normal alignment guarantees provided by malloc</span><br><span class="line">char* AllocateAligned(size_t bytes);</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">char* AllocateFallback(size_t bytes);</span><br><span class="line">char* AllocateNewBlock(size_t block_bytes);</span><br></pre></td></tr></table></figure></p>
+<p>实现<br>过程中分三种情况：</p>
+<ol>
+<li>剩余内存足够，直接使用剩余内存分配</li>
+<li>剩余内存不足，且申请空间 &gt; kBlockSize/4时，申请一个本次申请大小的block</li>
+<li>剩余内存不足，且申请空间 &lt;= kBlockSize/4时，申请一个kBlockSize大小的block</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">// 分配内存</span><br><span class="line">inline char* Arena::Allocate(size_t bytes) &#123;</span><br><span class="line">  // The semantics of what to return are a bit messy if we allow</span><br><span class="line">  // 0-byte allocations, so we disallow them here (we don&apos;t need</span><br><span class="line">  // them for our internal use).</span><br><span class="line">  assert(bytes &gt; 0);</span><br><span class="line">  </span><br><span class="line">  // 1.剩余内存足够，直接使用剩余内存分配</span><br><span class="line">  if (bytes &lt;= alloc_bytes_remaining_) &#123;</span><br><span class="line">    char* result = alloc_ptr_;</span><br><span class="line">    alloc_ptr_ += bytes;</span><br><span class="line">    alloc_bytes_remaining_ -= bytes;</span><br><span class="line">    return result;</span><br><span class="line">  &#125;</span><br><span class="line">  return AllocateFallback(bytes);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">char* Arena::AllocateFallback(size_t bytes) &#123;</span><br><span class="line">  // 2.剩余内存不足，且申请空间 &gt; kBlockSize/4时，申请一个本次申请大小的block</span><br><span class="line">  if (bytes &gt; kBlockSize / 4) &#123;</span><br><span class="line">    // Object is more than a quarter of our block size.  Allocate it separately</span><br><span class="line">    // to avoid wasting too much space in leftover bytes.</span><br><span class="line">    char* result = AllocateNewBlock(bytes);</span><br><span class="line">    return result;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // 3.剩余内存不足，且申请空间 &lt;= kBlockSize/4时，申请一个kBlockSize大小的block</span><br><span class="line">  // We waste the remaining space in the current block.</span><br><span class="line">  alloc_ptr_ = AllocateNewBlock(kBlockSize);</span><br><span class="line">  alloc_bytes_remaining_ = kBlockSize;</span><br><span class="line"></span><br><span class="line">  char* result = alloc_ptr_;</span><br><span class="line">  alloc_ptr_ += bytes;</span><br><span class="line">  alloc_bytes_remaining_ -= bytes;</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 申请指定大小block</span><br><span class="line">char* Arena::AllocateNewBlock(size_t block_bytes) &#123;</span><br><span class="line">  char* result = new char[block_bytes];</span><br><span class="line">  blocks_.push_back(result);        // 添加到blocks_中</span><br><span class="line">  // 更新MemoryUsage = 已申请内存 + 本次申请 + 一个指针大小</span><br><span class="line">  memory_usage_.NoBarrier_Store(</span><br><span class="line">      reinterpret_cast&lt;void*&gt;(MemoryUsage() + block_bytes + sizeof(char*)));</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="对齐申请"><a href="#对齐申请" class="headerlink" title="对齐申请"></a>对齐申请</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">char* Arena::AllocateAligned(size_t bytes) &#123;</span><br><span class="line">  //用于判断对齐的大小，我64位电脑sizeof(void*)=8，不大于8，所以对齐大小为8。</span><br><span class="line">  const int align = (sizeof(void*) &gt; 8) ? sizeof(void*) : 8;</span><br><span class="line">  </span><br><span class="line">  // 对齐肯定为2的n次幂 如8==1000 &amp; 7==0111 = 0</span><br><span class="line">  assert((align &amp; (align-1)) == 0);   // Pointer size should be a power of 2</span><br><span class="line">  </span><br><span class="line">  // alloc_ptr_ &amp; (align-1) 相当于对align取模，如9==1001&amp;7==0111 == 9%8 = 1</span><br><span class="line">  size_t current_mod = reinterpret_cast&lt;uintptr_t&gt;(alloc_ptr_) &amp; (align-1);</span><br><span class="line">  </span><br><span class="line">  // 计算溢出 即额外需要多少补齐</span><br><span class="line">  size_t slop = (current_mod == 0 ? 0 : align - current_mod);</span><br><span class="line">  </span><br><span class="line">  // 计算申请大小 = 要申请大小 + 补齐字节</span><br><span class="line">  size_t needed = bytes + slop;</span><br><span class="line">  char* result;</span><br><span class="line">  </span><br><span class="line">  // 有剩余，直接对齐分配</span><br><span class="line">  if (needed &lt;= alloc_bytes_remaining_) &#123;</span><br><span class="line">    result = alloc_ptr_ + slop;</span><br><span class="line">    alloc_ptr_ += needed;</span><br><span class="line">    alloc_bytes_remaining_ -= needed;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    // 重申申请 总是对齐的</span><br><span class="line">    // AllocateFallback always returned aligned memory</span><br><span class="line">    result = AllocateFallback(bytes);</span><br><span class="line">  &#125;</span><br><span class="line">  assert((reinterpret_cast&lt;uintptr_t&gt;(result) &amp; (align-1)) == 0);</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="提供MemoryUsage用于查看内存池总容量"><a href="#提供MemoryUsage用于查看内存池总容量" class="headerlink" title="提供MemoryUsage用于查看内存池总容量"></a>提供MemoryUsage用于查看内存池总容量</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// Returns an estimate of the total memory usage of data allocated</span><br><span class="line">// by the arena.</span><br><span class="line">size_t MemoryUsage() const &#123;</span><br><span class="line">  return reinterpret_cast&lt;uintptr_t&gt;(memory_usage_.NoBarrier_Load());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -469,8 +484,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -544,6 +568,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#成员变量"><span class="nav-number">1.</span> <span class="nav-text">成员变量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#构造析构"><span class="nav-number">2.</span> <span class="nav-text">构造析构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#申请内存"><span class="nav-number">3.</span> <span class="nav-text">申请内存</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#对齐申请"><span class="nav-number">3.1.</span> <span class="nav-text">对齐申请</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#提供MemoryUsage用于查看内存池总容量"><span class="nav-number">3.2.</span> <span class="nav-text">提供MemoryUsage用于查看内存池总容量</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
