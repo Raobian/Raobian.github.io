@@ -7,6 +7,22 @@
     </url>
 
     <url>
+        <loc>http://yoursite.com/2018/07/15/leveldb%E4%B9%8BMemTable/</loc>
+        <lastmod>2018-07-15T11:55:47.492Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>http://yoursite.com/2018/07/15/leveldb%E4%B9%8Bkey-Comparator/</loc>
+        <lastmod>2018-07-15T10:18:01.913Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://yoursite.com/2018/06/26/leveldb%E4%B9%8BSkipList/</loc>
         <lastmod>2018-07-15T07:59:40.663Z</lastmod>
         <changefreq>weekly</changefreq>
