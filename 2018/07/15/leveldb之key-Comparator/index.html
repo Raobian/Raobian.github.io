@@ -79,20 +79,20 @@
 
 
 
-<meta name="description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key keyValueType1234enum ValueType &amp;#123;  kTypeDeletion = 0x0,  //标记删除的  kTypeValue = 0x1&amp;#125;; SequenceNumber123456typedef uint64_t SequenceNumbe">
+<meta name="description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key">
 <meta name="keywords" content="leveldb">
 <meta property="og:type" content="article">
 <meta property="og:title" content="leveldb之key&amp;Comparator">
 <meta property="og:url" content="http://yoursite.com/2018/07/15/leveldb之key-Comparator/index.html">
 <meta property="og:site_name" content="老边&#39;blog">
-<meta property="og:description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key keyValueType1234enum ValueType &amp;#123;  kTypeDeletion = 0x0,  //标记删除的  kTypeValue = 0x1&amp;#125;; SequenceNumber123456typedef uint64_t SequenceNumbe">
+<meta property="og:description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/keycomparator/key.jpg">
 <meta property="og:image" content="http://yoursite.com/images/keycomparator/skip_list_key.jpg">
-<meta property="og:updated_time" content="2018-07-15T10:18:01.913Z">
+<meta property="og:updated_time" content="2018-07-15T12:07:31.465Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="leveldb之key&amp;Comparator">
-<meta name="twitter:description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key keyValueType1234enum ValueType &amp;#123;  kTypeDeletion = 0x0,  //标记删除的  kTypeValue = 0x1&amp;#125;; SequenceNumber123456typedef uint64_t SequenceNumbe">
+<meta name="twitter:description" content="leveldb中存在多种keyInternalKey &amp;amp; LookupKeyskip_list_key">
 <meta name="twitter:image" content="http://yoursite.com/images/keycomparator/key.jpg">
 
 
@@ -379,7 +379,7 @@
       
 
       
-        <p>leveldb中存在多种key<br>InternalKey &amp; LookupKey<br><img src="/images/keycomparator/key.jpg" alt="key"><br>skip_list_key<br><img src="/images/keycomparator/skip_list_key.jpg" alt="skip_list_key"></p>
+        <p>leveldb中存在多种key<br>InternalKey &amp; LookupKey<br><img src="/images/keycomparator/key.jpg" alt="key"><br>skip_list_key<br><img src="/images/keycomparator/skip_list_key.jpg" alt="skip_list_key"><br><a id="more"></a></p>
 <h2 id="key"><a href="#key" class="headerlink" title="key"></a>key</h2><h4 id="ValueType"><a href="#ValueType" class="headerlink" title="ValueType"></a>ValueType</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">enum ValueType &#123;</span><br><span class="line">  kTypeDeletion = 0x0,  //标记删除的</span><br><span class="line">  kTypeValue = 0x1</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h4 id="SequenceNumber"><a href="#SequenceNumber" class="headerlink" title="SequenceNumber"></a>SequenceNumber</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">typedef uint64_t SequenceNumber;</span><br><span class="line">// 低八位用于保存type</span><br><span class="line">// We leave eight bits empty at the bottom so a type and sequence#</span><br><span class="line">// can be packed together into 64-bits.</span><br><span class="line">static const SequenceNumber kMaxSequenceNumber =</span><br><span class="line">    ((0x1ull &lt;&lt; 56) - 1);</span><br></pre></td></tr></table></figure>
 <h4 id="ParsedInternalKey-解析的内部key，操作使用"><a href="#ParsedInternalKey-解析的内部key，操作使用" class="headerlink" title="ParsedInternalKey 解析的内部key，操作使用"></a>ParsedInternalKey 解析的内部key，操作使用</h4><p>| user_key | sequence | type |<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">struct ParsedInternalKey &#123;</span><br><span class="line">  Slice user_key;</span><br><span class="line">  SequenceNumber sequence;</span><br><span class="line">  ValueType type;</span><br><span class="line"></span><br><span class="line">  ParsedInternalKey() &#123; &#125;  // Intentionally left uninitialized (for speed)</span><br><span class="line">  ParsedInternalKey(const Slice&amp; u, const SequenceNumber&amp; seq, ValueType t)</span><br><span class="line">      : user_key(u), sequence(seq), type(t) &#123; &#125;</span><br><span class="line">  std::string DebugString() const;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
