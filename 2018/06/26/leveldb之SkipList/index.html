@@ -79,20 +79,20 @@
 
 
 
-<meta name="description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。 内存屏障leveldb是支持多线程操作的，但是skiplist并没有使用linux下锁，信号量来实现同步控制，据说是因为锁机制导致某个线程">
+<meta name="description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。">
 <meta name="keywords" content="leveldb">
 <meta property="og:type" content="article">
 <meta property="og:title" content="leveldb之SkipList">
 <meta property="og:url" content="http://yoursite.com/2018/06/26/leveldb之SkipList/index.html">
 <meta property="og:site_name" content="老边&#39;blog">
-<meta property="og:description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。 内存屏障leveldb是支持多线程操作的，但是skiplist并没有使用linux下锁，信号量来实现同步控制，据说是因为锁机制导致某个线程">
+<meta property="og:description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/skiplist/skiplist.gif">
 <meta property="og:image" content="http://yoursite.com/images/skiplist/skiplist.jpg">
-<meta property="og:updated_time" content="2018-07-15T07:40:51.685Z">
+<meta property="og:updated_time" content="2018-07-15T07:59:40.663Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="leveldb之SkipList">
-<meta name="twitter:description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。 内存屏障leveldb是支持多线程操作的，但是skiplist并没有使用linux下锁，信号量来实现同步控制，据说是因为锁机制导致某个线程">
+<meta name="twitter:description" content="Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。  skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。">
 <meta name="twitter:image" content="http://yoursite.com/images/skiplist/skiplist.gif">
 
 
@@ -380,7 +380,7 @@
 
       
         <p><img src="/images/skiplist/skiplist.gif" alt="skiplist"><br><img src="/images/skiplist/skiplist.jpg" alt="skiplist"><br>Memtable是leveldb的核心之一，而Memtable使用跳表SkipList实现。 </p>
-<p>skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。</p>
+<p>skiplist的效率可以和平衡树媲美，平均O(logN)，最坏O(N)的查询效率，但是用skiplist实现比平衡树实现简单，所以很多程序用跳跃链表来代替平衡树。<br><a id="more"></a></p>
 <h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><p>leveldb是支持多线程操作的，但是skiplist并没有使用linux下锁，信号量来实现同步控制，据说是因为锁机制导致某个线程占有资源，其他线程阻塞的情况，导致系统资源利用率降低。所以leveldb采用的是内存屏障来实现同步机制。</p>
 <p>内存屏障参考之前文章《leveldb之AtomicPointer》</p>
 <h2 id="SkipList"><a href="#SkipList" class="headerlink" title="SkipList"></a>SkipList</h2><p>先看节点SkipList::Node</p>
